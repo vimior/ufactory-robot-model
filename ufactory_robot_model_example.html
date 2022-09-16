@@ -8,6 +8,8 @@
       <button id="btn-xarm6-type6" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(6, 6)">XARM6</button>
       <button id="btn-xarm7-type7" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(7, 7)">XARM7</button>
       <button id="btn-xarm6-type9" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(6, 9)">LITE6</button>
+      <button id="btn-xarm6-type8" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(6, 8)">XARM6-TYPE8</button>
+      <button id="btn-xarm6-type11" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(6, 11)">XARM6-TYPE11</button>
     </div>
     <div id="model-wrapper">
       <div id="model-container"></div>
@@ -15,13 +17,15 @@
     <script src="./static/js/three.js/three.js"></script>
     <script src="./static/js/three.js/three-stl-loader.js"></script>
     <script src="./static/js/three.js/three-orbitcontrols.js"></script>
+    <script src="./static/js/three.js/three-transformcontrols.js"></script>
     <script src="./ufactory_robot_model.js"></script>
     <script>
       let robot_axis = 6;
       let robot_type = 6;
       const joints = [0, 0, 0, 0, 0, 0, 0]; // robot joints, degree 
       const rpy = [180, 0, 0]; // robot roll, pitch, yaw, degree
-      const ROBOTS = [[5, 5], [6, 6], [7, 7], [6, 9]];
+      const ROBOTS = [[5, 5], [6, 6], [7, 7], [6, 9], [6, 8], [6, 11]];
+      UFRobotModel.IS_RAINBOW_COLOR = true;
 
       function curRobotModel() {
         return UFRobotModel.getRobotModel(robot_axis, robot_type); 
@@ -105,15 +109,37 @@
         UFRobotModel.gridHelper = UFRobotModel.gridHelper || new THREE.GridHelper(50, 50, 0xdddddd, 0xdddddd);
         UFRobotModel.gridHelper.position.set(...UFRobotModel.BASE_GROUP_POSITION);
       };
+
+      function addBaseTransformControls() {
+        UFRobotModel.baseTransformControls = UFRobotModel.baseTransformControls || new THREE.TransformControls(UFRobotModel.camera, UFRobotModel.renderer.domElement);
+        UFRobotModel.baseTransformControls.setMode("translate");
+        UFRobotModel.baseTransformControls.scale.set(...[UFRobotModel.BASE_TRANSFORMCONTROLS_SCALE]);
+        UFRobotModel.baseTransformControls.dispose();
+        UFRobotModel.baseTransformControls.attach(curRobotModel().GROUPS[0]);
+        UFRobotModel.baseTransformControls.rotation.setFromRotationMatrix(UFRobotModel.get_base_transform_controls_matrix());
+      };
+
+      function addToolTransformControls() {
+        UFRobotModel.toolTransformControls = UFRobotModel.toolTransformControls || new THREE.TransformControls(UFRobotModel.camera, UFRobotModel.renderer.domElement);
+        UFRobotModel.toolTransformControls.setMode("translate");
+        UFRobotModel.toolTransformControls.scale.set(...[UFRobotModel.TOOL_TRANSFORMCONTROLS_SCALE]);
+        UFRobotModel.toolTransformControls.dispose();
+        UFRobotModel.toolTransformControls.attach(curRobotModel().GROUPS[curRobotModel().GROUPS.length - 1].children[0]);
+        UFRobotModel.toolTransformControls.rotation.setFromRotationMatrix(UFRobotModel.get_tool_transform_controls_matrix(180, 0, 0, false));
+      };
       
       function animate() {
         try {
+          if (RobotModelParams().showToolTransformControls) {
+            UFRobotModel.toolTransformControls.attach(curRobotModel().GROUPS[curRobotModel().GROUPS.length - 1].children[0]);
+            UFRobotModel.toolTransformControls.rotation.setFromRotationMatrix(UFRobotModel.get_tool_transform_controls_matrix(rpy[0], rpy[1], rpy[2], false));
+          }
           // set joints to model
           curRobotModel().set(joints);
           UFRobotModel.renderer.render( UFRobotModel.scene, UFRobotModel.camera );
           UFRobotModel.controls.update();
         } catch (e) {
-          // console.log(e)
+          console.log(e)
         }
         requestAnimationFrame( animate );
       }
@@ -136,6 +162,16 @@
         UFRobotModel.controls = UFRobotModel.controls || new THREE.OrbitControls(UFRobotModel.camera, UFRobotModel.renderer.domElement);
 
         const model_params = RobotModelParams();
+
+        addBaseTransformControls();
+        if (model_params.showBaseTransformControls) {
+          UFRobotModel.scene.add(UFRobotModel.baseTransformControls);
+        }
+
+        addToolTransformControls();
+        if (model_params.showToolTransformControls) {
+          UFRobotModel.scene.add(UFRobotModel.toolTransformControls);
+        }
 
         addGridHelpers();
         if (model_params.showGridHelper) {

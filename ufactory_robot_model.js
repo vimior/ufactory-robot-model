@@ -27,6 +27,20 @@ const toRadian = (degree) => { return 0.017453292519943295 * degree; };
 // const toDegree = (radian) => { return 180 / Math.PI * radian; }
 const toDegree = (radian) => { return 57.29577951308232 * radian; }
 
+const _Rx = (theta, is_radian) => { return new THREE.Matrix4().makeRotationX(is_radian ? theta : toRadian(theta)); }
+const _Ry = (theta, is_radian) => { return new THREE.Matrix4().makeRotationY(is_radian ? theta : toRadian(theta)); }
+const _Rz = (theta, is_radian) => { return new THREE.Matrix4().makeRotationZ(is_radian ? theta : toRadian(theta)); }
+
+const mat_from_static_euler = (roll, pitch, yaw, is_radian) => {
+  // 外旋
+  return _Rz(yaw, is_radian).multiply(_Ry(pitch, is_radian)).multiply(_Rx(roll, is_radian));
+};
+
+const mat_from_rotation_euler = (roll, pitch, yaw, is_radian) => {
+  // 内旋
+  return _Rx(roll, is_radian).multiply(_Ry(pitch, is_radian)).multiply(_Rz(yaw, is_radian));
+};
+
 const UFRobotModel = {
   SCALE: __SCALE,
   BASE_TRANSFORMCONTROLS_SCALE: [2, 2, 2],
@@ -383,6 +397,38 @@ const UFRobotModel = {
         console.warn( 'the method `update` has been deprecated. Use method `set` instead.' );
       UFRobotModel['XARM6-TYPE11'].set(joints, false);
     },
+  },
+
+  BASE_STATIC_MATRIX_: mat_from_rotation_euler(-90, 0, -90, false),
+  WORLD_OFFSET_MATRIX_: mat_from_static_euler(0, 0, 0, false),
+  TITL_ROTATION_MATRIX_: mat_from_rotation_euler(0, 0, 0, false),
+  BASE_TRANSFORMCONTROLS_MATRIX_: null,
+  set_world_offset(roll, pitch, yaw, is_radian) {
+    UFRobotModel.WORLD_OFFSET_MATRIX_ = mat_from_static_euler(roll, pitch, yaw, is_radian);
+    const matrix = UFRobotModel.BASE_STATIC_MATRIX_.clone();
+    matrix.multiply(UFRobotModel.WORLD_OFFSET_MATRIX_).multiply(UFRobotModel.TITL_ROTATION_MATRIX_);
+    UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ = matrix;
+  },
+  set_tilt_rotation(titl, rotation, is_radian) {
+    UFRobotModel.TITL_ROTATION_MATRIX_ = mat_from_rotation_euler(0, titl, rotation, is_radian);
+    const matrix = UFRobotModel.BASE_STATIC_MATRIX_.clone();
+    matrix.multiply(UFRobotModel.WORLD_OFFSET_MATRIX_).multiply(UFRobotModel.TITL_ROTATION_MATRIX_);
+    UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ = matrix;
+  },
+  get_base_transform_controls_matrix() {
+    if (UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ === null) {
+      const matrix = UFRobotModel.BASE_STATIC_MATRIX_.clone();
+      matrix.multiply(UFRobotModel.WORLD_OFFSET_MATRIX_).multiply(UFRobotModel.TITL_ROTATION_MATRIX_);
+      UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ = matrix.clone();
+    }
+    return UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_.clone();
+  },
+  get_tool_transform_controls_matrix(roll, pitch, yaw, is_radian) {
+    if (UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ === null) 
+      get_base_transform_controls_matrix();
+    const matrix = UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_.clone();
+    matrix.multiply(mat_from_static_euler(roll, pitch, yaw, is_radian));
+    return matrix;
   },
   _check_is_loaded(axis, type) {
     const RobotModel = this.getRobotModel(axis, type);
