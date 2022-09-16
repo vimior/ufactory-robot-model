@@ -4,12 +4,12 @@
   </head>
   <body>
     <div style="text-align: center;">
-      <button id="btn-xarm5-type5" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(5, 5)">XARM5</button>
-      <button id="btn-xarm6-type6" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(6, 6)">XARM6</button>
-      <button id="btn-xarm7-type7" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(7, 7)">XARM7</button>
-      <button id="btn-xarm6-type9" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(6, 9)">LITE6</button>
-      <button id="btn-xarm6-type8" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(6, 8)">XARM6-TYPE8</button>
-      <button id="btn-xarm6-type11" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(6, 11)">XARM6-TYPE11</button>
+      <button id="btn-xarm5-type5" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchModel(5, 5)">XARM5</button>
+      <button id="btn-xarm6-type6" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchModel(6, 6)">XARM6</button>
+      <button id="btn-xarm7-type7" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchModel(7, 7)">XARM7</button>
+      <button id="btn-xarm6-type9" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchModel(6, 9)">LITE6</button>
+      <button id="btn-xarm6-type8" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchModel(6, 8)">XARM6-TYPE8</button>
+      <button id="btn-xarm6-type11" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchModel(6, 11)">XARM6-TYPE11</button>
     </div>
     <div id="model-wrapper">
       <div id="model-container"></div>
@@ -53,7 +53,7 @@
         })
       }
 
-      function onSwitchMoel(axis, type) {
+      function onSwitchModel(axis, type) {
         switchModel(axis, type);
         setBtnStyle(axis, type);
       }
