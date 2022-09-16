@@ -1,0 +1,157 @@
+<html>
+  <head>
+    <title>UFACTORY Robot Model Example</title>
+  </head>
+  <body>
+    <div style="text-align: center;">
+      <button id="btn-xarm5-type5" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(5, 5)">XARM5</button>
+      <button id="btn-xarm6-type6" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(6, 6)">XARM6</button>
+      <button id="btn-xarm7-type7" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(7, 7)">XARM7</button>
+      <button id="btn-xarm6-type9" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchMoel(6, 9)">LITE6</button>
+    </div>
+    <div id="model-wrapper">
+      <div id="model-container"></div>
+    </div>
+    <script src="./static/js/three.js/three.js"></script>
+    <script src="./static/js/three.js/three-stl-loader.js"></script>
+    <script src="./static/js/three.js/three-orbitcontrols.js"></script>
+    <script src="./ufactory_robot_model.js"></script>
+    <script>
+      let xArmAxis = 6;
+      let xArmType = 6;
+      const joints = [0, 0, 0, 0, 0, 0, 0]; // robot joints, degree 
+      const rpy = [180, 0, 0]; // robot roll, pitch, yaw, degree
+      const ROBOTS = [[5, 5], [6, 6], [7, 7], [6, 9]];
+
+      function curRobotModel() {
+        return UFRobotModel.getRobotModel(xArmAxis, xArmType); 
+      };
+
+      function threeParams() {
+        return curRobotModel().params;
+      }
+
+      function setBtnStyle(axis, type) {
+        ROBOTS.forEach(robot => {
+          const ele = document.getElementById(`btn-xarm${robot[0]}-type${robot[1]}`);
+          if (ele) {
+            if (robot[0] === axis && robot[1] === type) {
+              ele.style.background = '#17b617';
+              ele.style.color = 'white';
+              ele.style['border-color'] = '#17b617';
+            }
+            else {
+              ele.style.background = '#DDD';
+              ele.style.color = 'black';
+              ele.style['border-color'] = '#DDD';
+            }
+          }
+        })
+      }
+
+      function onSwitchMoel(axis, type) {
+        switchModel(axis, type);
+        setBtnStyle(axis, type);
+      }
+
+      function switchModel(axis, type) {
+        if (UFRobotModel.scene) {
+          const FROM_MODEL = curRobotModel();
+          const TO_MODEL = UFRobotModel.getRobotModel(axis, type);
+          if (FROM_MODEL.AXIS !== TO_MODEL.AXIS || FROM_MODEL.TYPE !== TO_MODEL.TYPE) {
+            UFRobotModel.scene.remove(FROM_MODEL.GROUPS[0]);
+            UFRobotModel.load(axis, type).then(() => {
+              UFRobotModel.scene.add(TO_MODEL.GROUPS[0]);
+              UFRobotModel.renderer.render( UFRobotModel.scene, UFRobotModel.camera );
+              UFRobotModel.controls.update();
+              xArmAxis = axis;
+              xArmType = type;
+            });
+          }
+        }
+      };
+
+      function addCameras() {
+        const halfSize = [window.innerWidth / 100, window.innerHeight / 100];
+        UFRobotModel.camera = UFRobotModel.camera || new THREE.OrthographicCamera(-halfSize[0], halfSize[0], halfSize[1], -halfSize[1], -50, 50);
+        UFRobotModel.camera.position.set(3, 1, 3);
+        UFRobotModel.camera.zoom = threeParams().camZoom;
+        UFRobotModel.camera.lookAt(UFRobotModel.scene.position);
+      }
+
+      function addModels() {
+        UFRobotModel.scene.add(curRobotModel().GROUPS[0]);
+      }
+      
+      function addLights() {
+        UFRobotModel.light1 = UFRobotModel.light1 || new THREE.PointLight(0xffffff, 1, 100);
+        UFRobotModel.light1.position.set(0, 0, 30);
+        UFRobotModel.light2 = UFRobotModel.light2 || new THREE.PointLight(0xffffff, 1, 50);
+        UFRobotModel.light2.position.set(0, 0, -40);
+        UFRobotModel.light3 = UFRobotModel.light3 || new THREE.PointLight(0xffffff, 1, 100);
+        UFRobotModel.light3.position.set(-20, 20, -10);
+        UFRobotModel.light4 = UFRobotModel.light4 || new THREE.PointLight(0xffffff, 1, 100);
+        UFRobotModel.light4.position.set(20, -20, -10);
+        UFRobotModel.light5 = UFRobotModel.light5 || new THREE.PointLight(0xffffff, 1, 50);
+        UFRobotModel.light5.position.set(0, 40, -10);
+        UFRobotModel.scene.add(UFRobotModel.light1);
+        UFRobotModel.scene.add(UFRobotModel.light2);
+        UFRobotModel.scene.add(UFRobotModel.light3);
+        UFRobotModel.scene.add(UFRobotModel.light4);
+        UFRobotModel.scene.add(UFRobotModel.light5);
+      };
+
+      function addGridHelpers() {
+        UFRobotModel.gridHelper = UFRobotModel.gridHelper || new THREE.GridHelper(50, 50, 0xdddddd, 0xdddddd);
+        UFRobotModel.gridHelper.position.set(...UFRobotModel.BASE_GROUP_POSITION);
+      };
+      
+      function animate() {
+        try {
+          // set joints to model
+          curRobotModel().set(joints);
+          UFRobotModel.renderer.render( UFRobotModel.scene, UFRobotModel.camera );
+          UFRobotModel.controls.update();
+        } catch (e) {
+          // console.log(e)
+        }
+        requestAnimationFrame( animate );
+      }
+
+      function onWindowResize() {
+        UFRobotModel.camera.aspect = window.innerWidth / window.innerHeight;
+        UFRobotModel.camera.updateProjectionMatrix();
+        UFRobotModel.renderer.setSize( window.innerWidth, window.innerHeight);
+      }
+
+      UFRobotModel.load(xArmAxis, xArmType).then(() => {
+        UFRobotModel.scene = UFRobotModel.scene || new THREE.Scene();
+
+        addCameras();
+        addLights();
+        addModels();
+
+        UFRobotModel.renderer = UFRobotModel.renderer || new THREE.WebGLRenderer( { antialias: true } );
+        UFRobotModel.renderer.setClearColor(0xffffff);
+        UFRobotModel.controls = UFRobotModel.controls || new THREE.OrbitControls(UFRobotModel.camera, UFRobotModel.renderer.domElement);
+
+        const model_params = threeParams();
+
+        addGridHelpers();
+        if (model_params.showGridHelper) {
+          UFRobotModel.scene.add(UFRobotModel.gridHelper);
+        }
+
+        UFRobotModel.controls.update();
+
+        const container = document.getElementById('model-container');
+        container.appendChild(UFRobotModel.renderer.domElement);
+        
+        animate();
+        onWindowResize();
+        window.addEventListener('resize', onWindowResize, false); 
+        setBtnStyle(xArmAxis, xArmType);
+      });
+    </script>
+  </body>
+</html>
