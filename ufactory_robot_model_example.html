@@ -17,17 +17,17 @@
     <script src="./static/js/three.js/three-orbitcontrols.js"></script>
     <script src="./ufactory_robot_model.js"></script>
     <script>
-      let xArmAxis = 6;
-      let xArmType = 6;
+      let robot_axis = 6;
+      let robot_type = 6;
       const joints = [0, 0, 0, 0, 0, 0, 0]; // robot joints, degree 
       const rpy = [180, 0, 0]; // robot roll, pitch, yaw, degree
       const ROBOTS = [[5, 5], [6, 6], [7, 7], [6, 9]];
 
       function curRobotModel() {
-        return UFRobotModel.getRobotModel(xArmAxis, xArmType); 
+        return UFRobotModel.getRobotModel(robot_axis, robot_type); 
       };
 
-      function threeParams() {
+      function RobotModelParams() {
         return curRobotModel().params;
       }
 
@@ -64,8 +64,8 @@
               UFRobotModel.scene.add(TO_MODEL.GROUPS[0]);
               UFRobotModel.renderer.render( UFRobotModel.scene, UFRobotModel.camera );
               UFRobotModel.controls.update();
-              xArmAxis = axis;
-              xArmType = type;
+              robot_axis = axis;
+              robot_type = type;
             });
           }
         }
@@ -75,7 +75,7 @@
         const halfSize = [window.innerWidth / 100, window.innerHeight / 100];
         UFRobotModel.camera = UFRobotModel.camera || new THREE.OrthographicCamera(-halfSize[0], halfSize[0], halfSize[1], -halfSize[1], -50, 50);
         UFRobotModel.camera.position.set(3, 1, 3);
-        UFRobotModel.camera.zoom = threeParams().camZoom;
+        UFRobotModel.camera.zoom = RobotModelParams().camZoom;
         UFRobotModel.camera.lookAt(UFRobotModel.scene.position);
       }
 
@@ -124,7 +124,7 @@
         UFRobotModel.renderer.setSize( window.innerWidth, window.innerHeight);
       }
 
-      UFRobotModel.load(xArmAxis, xArmType).then(() => {
+      UFRobotModel.load(robot_axis, robot_type).then(() => {
         UFRobotModel.scene = UFRobotModel.scene || new THREE.Scene();
 
         addCameras();
@@ -135,7 +135,7 @@
         UFRobotModel.renderer.setClearColor(0xffffff);
         UFRobotModel.controls = UFRobotModel.controls || new THREE.OrbitControls(UFRobotModel.camera, UFRobotModel.renderer.domElement);
 
-        const model_params = threeParams();
+        const model_params = RobotModelParams();
 
         addGridHelpers();
         if (model_params.showGridHelper) {
@@ -150,7 +150,7 @@
         animate();
         onWindowResize();
         window.addEventListener('resize', onWindowResize, false); 
-        setBtnStyle(xArmAxis, xArmType);
+        setBtnStyle(robot_axis, robot_type);
       });
     </script>
   </body>

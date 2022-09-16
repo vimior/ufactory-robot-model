@@ -384,7 +384,6 @@ const UFRobotModel = {
       UFRobotModel['XARM6-TYPE11'].set(joints, false);
     },
   },
-
   _check_is_loaded(axis, type) {
     const RobotModel = this.getRobotModel(axis, type);
     return (RobotModel.LOADED_.length === axis + 1) && RobotModel.LOADED_.every(ele => { return ele === 0; });
