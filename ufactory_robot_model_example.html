@@ -113,7 +113,7 @@
       function addBaseTransformControls() {
         UFRobotModel.baseTransformControls = UFRobotModel.baseTransformControls || new THREE.TransformControls(UFRobotModel.camera, UFRobotModel.renderer.domElement);
         UFRobotModel.baseTransformControls.setMode("translate");
-        UFRobotModel.baseTransformControls.scale.set(...[UFRobotModel.BASE_TRANSFORMCONTROLS_SCALE]);
+        UFRobotModel.baseTransformControls.scale.set(...UFRobotModel.BASE_TRANSFORMCONTROLS_SCALE);
         UFRobotModel.baseTransformControls.dispose();
         UFRobotModel.baseTransformControls.attach(curRobotModel().GROUPS[0]);
         UFRobotModel.baseTransformControls.rotation.setFromRotationMatrix(UFRobotModel.get_base_transform_controls_matrix());
@@ -122,7 +122,7 @@
       function addToolTransformControls() {
         UFRobotModel.toolTransformControls = UFRobotModel.toolTransformControls || new THREE.TransformControls(UFRobotModel.camera, UFRobotModel.renderer.domElement);
         UFRobotModel.toolTransformControls.setMode("translate");
-        UFRobotModel.toolTransformControls.scale.set(...[UFRobotModel.TOOL_TRANSFORMCONTROLS_SCALE]);
+        UFRobotModel.toolTransformControls.scale.set(...UFRobotModel.TOOL_TRANSFORMCONTROLS_SCALE);
         UFRobotModel.toolTransformControls.dispose();
         UFRobotModel.toolTransformControls.attach(curRobotModel().GROUPS[curRobotModel().GROUPS.length - 1].children[0]);
         UFRobotModel.toolTransformControls.rotation.setFromRotationMatrix(UFRobotModel.get_tool_transform_controls_matrix(180, 0, 0, false));

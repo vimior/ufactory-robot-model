@@ -425,7 +425,7 @@ const UFRobotModel = {
   },
   get_tool_transform_controls_matrix(roll, pitch, yaw, is_radian) {
     if (UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ === null) 
-      get_base_transform_controls_matrix();
+      UFRobotModel.get_base_transform_controls_matrix();
     const matrix = UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_.clone();
     matrix.multiply(mat_from_static_euler(roll, pitch, yaw, is_radian));
     return matrix;
