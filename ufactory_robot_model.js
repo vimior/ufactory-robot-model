@@ -400,11 +400,11 @@ const UFRobotModel = {
   },
 
   BASE_STATIC_MATRIX_: mat_from_rotation_euler(-90, 0, -90, false),
-  WORLD_OFFSET_MATRIX_: mat_from_static_euler(0, 0, 0, false),
+  WORLD_OFFSET_MATRIX_: mat_from_static_euler(0, 0, 0, false).transpose(),
   TITL_ROTATION_MATRIX_: mat_from_rotation_euler(0, 0, 0, false),
   BASE_TRANSFORMCONTROLS_MATRIX_: null,
   set_world_offset(roll, pitch, yaw, is_radian) {
-    UFRobotModel.WORLD_OFFSET_MATRIX_ = mat_from_static_euler(roll, pitch, yaw, is_radian);
+    UFRobotModel.WORLD_OFFSET_MATRIX_ = mat_from_static_euler(roll, pitch, yaw, is_radian).transpose();
     const matrix = UFRobotModel.BASE_STATIC_MATRIX_.clone();
     matrix.multiply(UFRobotModel.WORLD_OFFSET_MATRIX_).multiply(UFRobotModel.TITL_ROTATION_MATRIX_);
     UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ = matrix;
