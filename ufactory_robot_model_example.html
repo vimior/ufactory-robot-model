@@ -11,6 +11,13 @@
       <button id="btn-xarm6-type8" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchModel(6, 8)">XARM6-TYPE8</button>
       <button id="btn-xarm6-type11" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchModel(6, 11)">XARM6-TYPE11</button>
     </div>
+    <div style="text-align: center;">
+      <label id="label-no-end"><input name="EndEffector" type="radio" value="" checked="true" onclick="onSwitchEndEffector('')" />No End Effector</label> 
+      <label id="lable-gripper"><input name="EndEffector" type="radio" value="gripper" onclick="onSwitchEndEffector('gripper')" />Gripper</label> 
+      <label id="lable-vacuum-gripper"><input name="EndEffector" type="radio" value="vacuum-gripper" onclick="onSwitchEndEffector('vacuum-gripper')" />Vacuum Gripper</label> 
+      <label id="lable-bio-gripper"><input name="EndEffector" type="radio" value="bio-gripper" onclick="onSwitchEndEffector('bio-gripper')" />BIO Gripper</label> 
+      <label id="lable-robotiq-2F-85"><input name="EndEffector" type="radio" value="robotiq-2F-85" onclick="onSwitchEndEffector('robotiq-2F-85')" />Robotiq-2F-85</label>
+    </div>
     <div id="model-wrapper">
       <div id="model-container"></div>
     </div>
@@ -26,6 +33,7 @@
       const rpy = [180, 0, 0]; // robot roll, pitch, yaw, degree
       const ROBOTS = [[5, 5], [6, 6], [7, 7], [6, 9], [6, 8], [6, 11]];
       UFRobotModel.IS_RAINBOW_COLOR = true;
+      let curr_end_type = '';
 
       function curRobotModel() {
         return UFRobotModel.getRobotModel(robot_axis, robot_type); 
@@ -35,7 +43,7 @@
         return curRobotModel().params;
       }
 
-      function setBtnStyle(axis, type) {
+      function setStyle(axis, type) {
         ROBOTS.forEach(robot => {
           const ele = document.getElementById(`btn-xarm${robot[0]}-type${robot[1]}`);
           if (ele) {
@@ -51,11 +59,40 @@
             }
           }
         })
+        const ele0 = document.getElementById('label-no-end');
+        const ele1 = document.getElementById('lable-gripper');
+        const ele2 = document.getElementById('lable-bio-gripper');
+        const ele3 = document.getElementById('lable-robotiq-2F-85');
+        if (axis === 6 && type === 9) {
+          ele1.getElementsByTagName('input')[0].disabled = false;
+          ele2.getElementsByTagName('input')[0].disabled = true;  // not support
+          ele3.getElementsByTagName('input')[0].disabled = true;  // not support
+          // not support
+          if (curr_end_type === 'bio-gripper' || curr_end_type === 'robotiq-2F-85') {
+            curr_end_type = '';
+            ele0.getElementsByTagName('input')[0].checked = true;
+          }
+        }
+        else {
+          ele1.getElementsByTagName('input')[0].disabled = true;  // no model file
+          ele2.getElementsByTagName('input')[0].disabled = false;
+          ele3.getElementsByTagName('input')[0].disabled = false;
+          if (curr_end_type === 'gripper') { // no model file
+            curr_end_type = '';
+            ele0.getElementsByTagName('input')[0].checked = true;
+          }
+        }
       }
 
       function onSwitchModel(axis, type) {
+        setStyle(axis, type);
         switchModel(axis, type);
-        setBtnStyle(axis, type);
+      }
+
+      function onSwitchEndEffector(val) {
+        if (val === curr_end_type) return;
+        curr_end_type = val;
+        UFRobotModel.addEndEffector(robot_axis, robot_type, curr_end_type);
       }
 
       function switchModel(axis, type) {
@@ -70,6 +107,7 @@
               UFRobotModel.controls.update();
               robot_axis = axis;
               robot_type = type;
+              UFRobotModel.addEndEffector(robot_axis, robot_type, curr_end_type);
             });
           }
         }
@@ -150,6 +188,8 @@
         UFRobotModel.renderer.setSize( window.innerWidth, window.innerHeight);
       }
 
+      setStyle(robot_axis, robot_type);
+
       UFRobotModel.load(robot_axis, robot_type).then(() => {
         UFRobotModel.scene = UFRobotModel.scene || new THREE.Scene();
 
@@ -186,7 +226,6 @@
         animate();
         onWindowResize();
         window.addEventListener('resize', onWindowResize, false); 
-        setBtnStyle(robot_axis, robot_type);
       });
     </script>
   </body>

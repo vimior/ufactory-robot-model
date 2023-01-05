@@ -398,6 +398,145 @@ const UFRobotModel = {
       UFRobotModel['XARM6-TYPE11'].set(joints, false);
     },
   },
+  END_EFFECTOR: {
+    xarm_gripper: {
+      LOADED: -1,
+      SRC: null,
+      GROUP: null,
+      MESH: null,
+      GROUP_POSITION: [0, 0, 0],
+      MESHS_ROTATION: [180, 0, 0],
+      SCALE: [1, 1, 1],
+    },
+    xarm_vacuum_gripper: {
+      LOADED: -1,
+      SRC: null,
+      GROUP: null,
+      MESH: null,
+      GROUP_POSITION: [0, 0, 0],
+      MESHS_ROTATION: [180, 0, 0],
+      SCALE: [1, 1, 1],
+    },
+    xarm_bio_gripper: {
+      LOADED: -1,
+      SRC: null,
+      GROUP: null,
+      MESH: null,
+      GROUP_POSITION: [0.0825, 0, 0.0365],
+      MESHS_ROTATION: [0, 180, 90],
+      SCALE: [1, 1, 1],
+    },
+    lite_gripper: {
+      LOADED: -1,
+      SRC: null,
+      GROUP: null,
+      MESH: null,
+      GROUP_POSITION: [-38.75, 0, 38.75],
+      MESHS_ROTATION: [180, 0, 0],
+      SCALE: [0.001, 0.001, 0.001],
+    },
+    lite_vacuum_gripper: {
+      LOADED: -1,
+      SRC: null,
+      GROUP: null,
+      MESH: null,
+      GROUP_POSITION: [0, 0, 0],
+      MESHS_ROTATION: [180, 0, 0],
+      SCALE: [1, 1, 1],
+    },
+    Robotiq_2F_85: {
+      LOADED: -1,
+      SRC: null,
+      GROUP: null,
+      MESH: null,
+      GROUP_POSITION: [0, 0, 0],
+      MESHS_ROTATION: [180, 0, 90],
+      SCALE: [1, 1, 1],
+    },
+    load: (end_effector) => {
+      return new Promise((resolve) => {
+        const model = UFRobotModel.END_EFFECTOR[end_effector];
+        if (!model) {
+          resolve();
+          return;
+        };
+        if (model.LOADED !== -1) {
+          if (model.LOADED === 1)
+            resolve();
+          return;
+        };
+        model.LOADED = 0;
+        model.SRC = `./static/stl/end_effector/${end_effector}.stl`;
+        model.GROUP = model.GROUP || new THREE.Group();
+        model.GROUP.position.set(...[
+          model.GROUP_POSITION[0] * UFRobotModel.SCALE[0] * model.SCALE[0],
+          model.GROUP_POSITION[1] * UFRobotModel.SCALE[1] * model.SCALE[1],
+          model.GROUP_POSITION[2] * UFRobotModel.SCALE[2] * model.SCALE[2]
+        ]);
+        UFRobotModel.STL_LOADER_.load(model.SRC, (geometry) => {
+          model.MESH = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: '#fff' }));
+          model.MESH.scale.set(...[
+            UFRobotModel.SCALE[0] * model.SCALE[0],
+            UFRobotModel.SCALE[1] * model.SCALE[1],
+            UFRobotModel.SCALE[2] * model.SCALE[2]
+          ]);
+          model.MESH.rotation.set(...[
+            model.MESHS_ROTATION[0] + UFRobotModel.BASE_MESH_ROTATION[0],
+            model.MESHS_ROTATION[1] + UFRobotModel.BASE_MESH_ROTATION[1],
+            model.MESHS_ROTATION[2] + UFRobotModel.BASE_MESH_ROTATION[2]
+          ].map(toRadian));
+          model.GROUP.add(model.MESH);
+          model.LOADED = 1;
+          console.log(`load ${end_effector} mesh success`);
+        }, (progress) => {
+          // console.log(`load ${end_effector} mesh progress: ${progress.loaded / progress.total * 100}%`);
+        }, (err) => {
+          model.LOADED = -1;
+          console.error(`load ${end_effector} mesh error`, err);
+        });
+        const t = setInterval(() => {
+          if (model.LOADED === 1) {
+            clearInterval(t);
+            resolve();
+          }
+        }, 50);
+      })
+    }
+  },
+  addEndEffector(axis, type, end_type) {
+    const RobotModel = this.getRobotModel(axis, type);
+    let isLite = RobotModel.AXIS === 6 && RobotModel.TYPE === 9;
+    let name = '';
+    switch (end_type) {
+      case 'gripper':
+        name = `${isLite ? 'lite' : 'xarm'}_gripper`;
+        break;
+      case 'bio-gripper':
+        name = `${isLite ? 'lite' : 'xarm'}_bio_gripper`;
+        break;
+      case 'suctioncup':
+      case 'vacuum-gripper':
+        name = `${isLite ? 'lite' : 'xarm'}_vacuum_gripper`;
+        break;
+      case 'robotiq-2F-85':
+        name = 'Robotiq_2F_85';
+        break;
+      case 'robotiq-2F-140':
+      default:
+        break;
+    }
+    const objects = Object.assign([], RobotModel.GROUPS[RobotModel.AXIS].children);
+    for (let i = 1; i < objects.length; i++) {
+      RobotModel.GROUPS[RobotModel.AXIS].remove(objects[i]);
+    }
+    const endModel = this.END_EFFECTOR[name];
+    if (!endModel) return;
+    this.END_EFFECTOR.load(name).then(() => {
+      if (endModel.LOADED === 1)
+        // RobotModel.GROUPS[RobotModel.AXIS].add(RobotModel.MESHS[RobotModel.AXIS], endModel.GROUP);
+        RobotModel.GROUPS[RobotModel.AXIS].add(endModel.GROUP);
+    });
+  },
 
   BASE_STATIC_MATRIX_: mat_from_rotation_euler(-90, 0, -90, false),
   WORLD_OFFSET_MATRIX_: mat_from_static_euler(0, 0, 0, false).transpose(),
@@ -418,7 +557,7 @@ const UFRobotModel = {
   get_base_transform_controls_matrix() {
     if (UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ === null) {
       const matrix = UFRobotModel.BASE_STATIC_MATRIX_.clone();
-      matrix.multiply(UFRobotModel.WORLD_OFFSET_MATRIX_).multiply(UFRobotModel.TITL_ROTATION_MATRIX_);
+      matrix.multiply(UFRobotModel.TITL_ROTATION_MATRIX_).multiply(UFRobotModel.WORLD_OFFSET_MATRIX_);
       UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ = matrix.clone();
     }
     return UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_.clone();
