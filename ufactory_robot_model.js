@@ -88,7 +88,7 @@ const UFRobotModel = {
     GROUPS: [],
     MESHS: [],
     MESHS_ROTATION_: [
-      [0, 0, 0], [0, 0, 180], [0, -90, 180], [0, -90, 180],
+      [0, 0, -90], [0, 0, 180], [0, -90, 180], [0, -90, 180],
       [0, -90, 180], [0, 180, 180],
     ],
     GROUPS_POSITION_: [
@@ -106,7 +106,8 @@ const UFRobotModel = {
     },
     get: (is_radian) => {
       return [
-        is_radian ? (UFRobotModel.XARM5.GROUPS[1].rotation.y + Math.PI) : toDegree(UFRobotModel.XARM5.GROUPS[1].rotation.y + Math.PI),
+        // is_radian ? (UFRobotModel.XARM5.GROUPS[1].rotation.y + Math.PI) : toDegree(UFRobotModel.XARM5.GROUPS[1].rotation.y + Math.PI),
+        is_radian ? (UFRobotModel.XARM5.GROUPS[1].rotation.y - Math.PI / 2) : toDegree(UFRobotModel.XARM5.GROUPS[1].rotation.y - Math.PI / 2),
         is_radian ? -UFRobotModel.XARM5.GROUPS[2].rotation.x : -toDegree(UFRobotModel.XARM5.GROUPS[2].rotation.x),
         is_radian ? -UFRobotModel.XARM5.GROUPS[3].rotation.x : -toDegree(UFRobotModel.XARM5.GROUPS[3].rotation.x),
         is_radian ? -UFRobotModel.XARM5.GROUPS[4].rotation.x : -toDegree(UFRobotModel.XARM5.GROUPS[4].rotation.x),
@@ -114,7 +115,8 @@ const UFRobotModel = {
       ];
     },
     set: (joints, is_radian) => {
-      UFRobotModel.XARM5.GROUPS[1].rotation.y = is_radian ? (joints[0] - Math.PI) : toRadian(joints[0] - 180);
+      // UFRobotModel.XARM5.GROUPS[1].rotation.y = is_radian ? (joints[0] - Math.PI) : toRadian(joints[0] - 180);
+      UFRobotModel.XARM5.GROUPS[1].rotation.y = is_radian ? (joints[0] + Math.PI / 2) : toRadian(joints[0] + 90);
       UFRobotModel.XARM5.GROUPS[2].rotation.x = is_radian ? -joints[1] : -toRadian(joints[1]);
       UFRobotModel.XARM5.GROUPS[3].rotation.x = is_radian ? -joints[2] : -toRadian(joints[2]);
       UFRobotModel.XARM5.GROUPS[4].rotation.x = is_radian ? -joints[3] : -toRadian(joints[3]);
@@ -139,7 +141,7 @@ const UFRobotModel = {
     GROUPS: [],
     MESHS: [],
     MESHS_ROTATION_: [
-      [0, 0, 0], [0, 0, 180], [0, -90, 180], [0, -90, 180],
+      [0, 0, -90], [0, 0, 180], [0, -90, 180], [0, -90, 180],
       [180, 0, 0], [0, -90, 180], [0, 180, 180],
     ],
     GROUPS_POSITION_: [
@@ -157,7 +159,8 @@ const UFRobotModel = {
     },
     get: (is_radian) => {
       return [
-        is_radian ? (UFRobotModel.XARM6.GROUPS[1].rotation.y + Math.PI) : toDegree(UFRobotModel.XARM6.GROUPS[1].rotation.y + Math.PI),
+        // is_radian ? (UFRobotModel.XARM6.GROUPS[1].rotation.y + Math.PI) : toDegree(UFRobotModel.XARM6.GROUPS[1].rotation.y + Math.PI),
+        is_radian ? (UFRobotModel.XARM6.GROUPS[1].rotation.y - Math.PI / 2) : toDegree(UFRobotModel.XARM6.GROUPS[1].rotation.y - Math.PI / 2),
         is_radian ? -UFRobotModel.XARM6.GROUPS[2].rotation.x : -toDegree(UFRobotModel.XARM6.GROUPS[2].rotation.x),
         is_radian ? -UFRobotModel.XARM6.GROUPS[3].rotation.x : -toDegree(UFRobotModel.XARM6.GROUPS[3].rotation.x),
         is_radian ? -UFRobotModel.XARM6.GROUPS[4].rotation.y : -toDegree(UFRobotModel.XARM6.GROUPS[4].rotation.y),
@@ -166,7 +169,8 @@ const UFRobotModel = {
       ];
     },
     set: (joints, is_radian) => {
-      UFRobotModel.XARM6.GROUPS[1].rotation.y = is_radian ? (joints[0] - Math.PI) : toRadian(joints[0] - 180);
+      // UFRobotModel.XARM6.GROUPS[1].rotation.y = is_radian ? (joints[0] - Math.PI) : toRadian(joints[0] - 180);
+      UFRobotModel.XARM6.GROUPS[1].rotation.y = is_radian ? (joints[0] + Math.PI / 2) : toRadian(joints[0] + 90);
       UFRobotModel.XARM6.GROUPS[2].rotation.x = is_radian ? -joints[1] : -toRadian(joints[1]);
       UFRobotModel.XARM6.GROUPS[3].rotation.x = is_radian ? -joints[2] : -toRadian(joints[2]);
       UFRobotModel.XARM6.GROUPS[4].rotation.y = is_radian ? -joints[3] : -toRadian(joints[3]);
@@ -192,7 +196,7 @@ const UFRobotModel = {
     GROUPS: [],
     MESHS: [],
     MESHS_ROTATION_: [
-      [0, 0, 0], [0, 0, 180], [0, -90, 180], [0, 0, 180],
+      [0, 0, -90], [0, 0, 180], [0, -90, 180], [0, 0, 180],
       [0, 90, 180], [180, 0, 0], [0, -90, 180], [0, 180, 180],
     ],
     GROUPS_POSITION_: [
@@ -210,7 +214,8 @@ const UFRobotModel = {
     },
     get: (is_radian) => {
       return [
-        is_radian ? (UFRobotModel.XARM7.GROUPS[1].rotation.y + Math.PI) : toDegree(UFRobotModel.XARM7.GROUPS[1].rotation.y + Math.PI),
+        // is_radian ? (UFRobotModel.XARM7.GROUPS[1].rotation.y + Math.PI) : toDegree(UFRobotModel.XARM7.GROUPS[1].rotation.y + Math.PI),
+        is_radian ? (UFRobotModel.XARM7.GROUPS[1].rotation.y - Math.PI / 2) : toDegree(UFRobotModel.XARM7.GROUPS[1].rotation.y - Math.PI / 2),
         is_radian ? -UFRobotModel.XARM7.GROUPS[2].rotation.x : -toDegree(UFRobotModel.XARM7.GROUPS[2].rotation.x),
         is_radian ? UFRobotModel.XARM7.GROUPS[3].rotation.y : toDegree(UFRobotModel.XARM7.GROUPS[3].rotation.y),
         is_radian ? UFRobotModel.XARM7.GROUPS[4].rotation.x : toDegree(UFRobotModel.XARM7.GROUPS[4].rotation.x),
@@ -220,7 +225,8 @@ const UFRobotModel = {
       ];
     },
     set: (joints, is_radian) => {
-      UFRobotModel.XARM7.GROUPS[1].rotation.y = is_radian ? (joints[0] - Math.PI) : toRadian(joints[0] - 180);
+      // UFRobotModel.XARM7.GROUPS[1].rotation.y = is_radian ? (joints[0] - Math.PI) : toRadian(joints[0] - 180);
+      UFRobotModel.XARM7.GROUPS[1].rotation.y = is_radian ? (joints[0] + Math.PI / 2) : toRadian(joints[0] + 90);
       UFRobotModel.XARM7.GROUPS[2].rotation.x = is_radian ? -joints[1] : -toRadian(joints[1]);
       UFRobotModel.XARM7.GROUPS[3].rotation.y = is_radian ? joints[2] : toRadian(joints[2]);
       UFRobotModel.XARM7.GROUPS[4].rotation.x = is_radian ? joints[3] : toRadian(joints[3]);
@@ -247,7 +253,7 @@ const UFRobotModel = {
     GROUPS: [],
     MESHS: [],
     MESHS_ROTATION_: [
-      [0, 0, 0], [0, 0, 180], [0, -90, 180], [0, 90, 180],
+      [0, 0, -90], [0, 0, 180], [0, -90, 180], [0, 90, 180],
       [180, 0, 0], [0, -90, 180], [0, 180, 180],
     ],
     GROUPS_POSITION_: [
@@ -265,7 +271,8 @@ const UFRobotModel = {
     },
     get: (is_radian) => {
       return [
-        is_radian ? (UFRobotModel['XARM6-TYPE8'].GROUPS[1].rotation.y + Math.PI) : toDegree(UFRobotModel['XARM6-TYPE8'].GROUPS[1].rotation.y + Math.PI),
+        // is_radian ? (UFRobotModel['XARM6-TYPE8'].GROUPS[1].rotation.y + Math.PI) : toDegree(UFRobotModel['XARM6-TYPE8'].GROUPS[1].rotation.y + Math.PI),
+        is_radian ? (UFRobotModel['XARM6-TYPE8'].GROUPS[1].rotation.y - Math.PI / 2) : toDegree(UFRobotModel['XARM6-TYPE8'].GROUPS[1].rotation.y - Math.PI / 2),
         is_radian ? -UFRobotModel['XARM6-TYPE8'].GROUPS[2].rotation.x : -toDegree(UFRobotModel['XARM6-TYPE8'].GROUPS[2].rotation.x),
         is_radian ? UFRobotModel['XARM6-TYPE8'].GROUPS[3].rotation.x : toDegree(UFRobotModel['XARM6-TYPE8'].GROUPS[3].rotation.x),
         is_radian ? -UFRobotModel['XARM6-TYPE8'].GROUPS[4].rotation.y : -toDegree(UFRobotModel['XARM6-TYPE8'].GROUPS[4].rotation.y),
@@ -274,7 +281,8 @@ const UFRobotModel = {
       ];
     },
     set: (joints, is_radian) => {
-      UFRobotModel['XARM6-TYPE8'].GROUPS[1].rotation.y = is_radian ? (joints[0] - Math.PI) : toRadian(joints[0] - 180);
+      // UFRobotModel['XARM6-TYPE8'].GROUPS[1].rotation.y = is_radian ? (joints[0] - Math.PI) : toRadian(joints[0] - 180);
+      UFRobotModel['XARM6-TYPE8'].GROUPS[1].rotation.y = is_radian ? (joints[0] + Math.PI / 2) : toRadian(joints[0] + 90);
       UFRobotModel['XARM6-TYPE8'].GROUPS[2].rotation.x = is_radian ? -joints[1] : -toRadian(joints[1]);
       UFRobotModel['XARM6-TYPE8'].GROUPS[3].rotation.x = is_radian ? joints[2] : toRadian(joints[2]);
       UFRobotModel['XARM6-TYPE8'].GROUPS[4].rotation.y = is_radian ? -joints[3] : -toRadian(joints[3]);
@@ -300,7 +308,7 @@ const UFRobotModel = {
     GROUPS: [],
     MESHS: [],
     MESHS_ROTATION_: [
-      [0, 0, 0], [0, 0, 180], [0, -90, 90], [0, 90, 180],
+      [0, 0, -90], [0, 0, 180], [0, -90, 90], [0, 90, 180],
       [180, 0, 0], [0, -90, 180], [0, 180, 180],
     ],
     GROUPS_POSITION_: [
@@ -318,7 +326,8 @@ const UFRobotModel = {
     },
     get: (is_radian) => {
       return [
-        is_radian ? (UFRobotModel['XARM6-TYPE9'].GROUPS[1].rotation.y + Math.PI) : toDegree(UFRobotModel['XARM6-TYPE9'].GROUPS[1].rotation.y + Math.PI),
+        // is_radian ? (UFRobotModel['XARM6-TYPE9'].GROUPS[1].rotation.y + Math.PI) : toDegree(UFRobotModel['XARM6-TYPE9'].GROUPS[1].rotation.y + Math.PI),
+        is_radian ? (UFRobotModel['XARM6-TYPE9'].GROUPS[1].rotation.y - Math.PI / 2) : toDegree(UFRobotModel['XARM6-TYPE9'].GROUPS[1].rotation.y - Math.PI / 2),
         is_radian ? -UFRobotModel['XARM6-TYPE9'].GROUPS[2].rotation.x : -toDegree(UFRobotModel['XARM6-TYPE9'].GROUPS[2].rotation.x),
         is_radian ? UFRobotModel['XARM6-TYPE9'].GROUPS[3].rotation.x : toDegree(UFRobotModel['XARM6-TYPE9'].GROUPS[3].rotation.x),
         is_radian ? -UFRobotModel['XARM6-TYPE9'].GROUPS[4].rotation.y : -toDegree(UFRobotModel['XARM6-TYPE9'].GROUPS[4].rotation.y),
@@ -327,7 +336,8 @@ const UFRobotModel = {
       ];
     },
     set: (joints, is_radian) => {
-      UFRobotModel['XARM6-TYPE9'].GROUPS[1].rotation.y = is_radian ? (joints[0] - Math.PI) : toRadian(joints[0] - 180);
+      // UFRobotModel['XARM6-TYPE9'].GROUPS[1].rotation.y = is_radian ? (joints[0] - Math.PI) : toRadian(joints[0] - 180);
+      UFRobotModel['XARM6-TYPE9'].GROUPS[1].rotation.y = is_radian ? (joints[0] + Math.PI / 2) : toRadian(joints[0] + 90);
       UFRobotModel['XARM6-TYPE9'].GROUPS[2].rotation.x = is_radian ? -joints[1] : -toRadian(joints[1]);
       UFRobotModel['XARM6-TYPE9'].GROUPS[3].rotation.x = is_radian ? joints[2] : toRadian(joints[2]);
       UFRobotModel['XARM6-TYPE9'].GROUPS[4].rotation.y = is_radian ? -joints[3] : -toRadian(joints[3]);
@@ -357,7 +367,7 @@ const UFRobotModel = {
       [0, -0.3425, -0.0775], [0, 0, 0], [0, -0.097, -0.076],
     ],
     MESHS_ROTATION_: [
-      [0, 0, 0], [0, 0, 180], [0, -90, 180], [0, 90, 180],
+      [0, 0, -90], [0, 0, 180], [0, -90, 180], [0, 90, 180],
       [180, 0, 0], [0, -90, 180], [0, 180, 180],
     ],
     params: {
@@ -371,7 +381,8 @@ const UFRobotModel = {
     },
     get: (is_radian) => {
       return [
-        is_radian ? (UFRobotModel['XARM6-TYPE11'].GROUPS[1].rotation.y + Math.PI) : toDegree(UFRobotModel['XARM6-TYPE11'].GROUPS[1].rotation.y + Math.PI),
+        // is_radian ? (UFRobotModel['XARM6-TYPE11'].GROUPS[1].rotation.y + Math.PI) : toDegree(UFRobotModel['XARM6-TYPE11'].GROUPS[1].rotation.y + Math.PI),
+        is_radian ? (UFRobotModel['XARM6-TYPE11'].GROUPS[1].rotation.y - Math.PI / 2) : toDegree(UFRobotModel['XARM6-TYPE11'].GROUPS[1].rotation.y - Math.PI / 2),
         is_radian ? -UFRobotModel['XARM6-TYPE11'].GROUPS[2].rotation.x : -toDegree(UFRobotModel['XARM6-TYPE11'].GROUPS[2].rotation.x),
         is_radian ? UFRobotModel['XARM6-TYPE11'].GROUPS[3].rotation.x : toDegree(UFRobotModel['XARM6-TYPE11'].GROUPS[3].rotation.x),
         is_radian ? UFRobotModel['XARM6-TYPE11'].GROUPS[4].rotation.y : toDegree(UFRobotModel['XARM6-TYPE11'].GROUPS[4].rotation.y),
@@ -380,7 +391,8 @@ const UFRobotModel = {
       ];
     },
     set: (joints, is_radian) => {
-      UFRobotModel['XARM6-TYPE11'].GROUPS[1].rotation.y = is_radian ? (joints[0] - Math.PI) : toRadian(joints[0] - 180);
+      // UFRobotModel['XARM6-TYPE11'].GROUPS[1].rotation.y = is_radian ? (joints[0] - Math.PI) : toRadian(joints[0] - 180);
+      UFRobotModel['XARM6-TYPE11'].GROUPS[1].rotation.y = is_radian ? (joints[0] + Math.PI / 2) : toRadian(joints[0] + 90);
       UFRobotModel['XARM6-TYPE11'].GROUPS[2].rotation.x = is_radian ? -joints[1] : -toRadian(joints[1]);
       UFRobotModel['XARM6-TYPE11'].GROUPS[3].rotation.x = is_radian ? joints[2] : toRadian(joints[2]);
       UFRobotModel['XARM6-TYPE11'].GROUPS[4].rotation.y = is_radian ? joints[3] : toRadian(joints[3]);
@@ -449,9 +461,9 @@ const UFRobotModel = {
       SRC: null,
       GROUP: null,
       MESH: null,
-      GROUP_POSITION: [0, 0, 0],
+      GROUP_POSITION: [0, 0.0018616, 0],            // 需要减去沉台的高度0.0028865, 0.0018616 == 0.0028865 / 1.55054786
       MESHS_ROTATION: [180, 0, 90],
-      SCALE: [1, 1, 1],
+      SCALE: [1.55054786, 1.55054786, 1.55054786],  // 根据底面直径算的比例
     },
     load: (end_effector) => {
       return new Promise((resolve) => {
@@ -538,26 +550,26 @@ const UFRobotModel = {
     });
   },
 
-  BASE_STATIC_MATRIX_: mat_from_rotation_euler(-90, 0, -90, false),
+  BASE_STATIC_MATRIX_: mat_from_rotation_euler(-90, 0, 180, false),
   WORLD_OFFSET_MATRIX_: mat_from_static_euler(0, 0, 0, false).transpose(),
-  TITL_ROTATION_MATRIX_: mat_from_rotation_euler(0, 0, 0, false),
+  TILT_ROTATION_MATRIX_: mat_from_rotation_euler(0, 0, 0, false),
   BASE_TRANSFORMCONTROLS_MATRIX_: null,
   set_world_offset(roll, pitch, yaw, is_radian) {
     UFRobotModel.WORLD_OFFSET_MATRIX_ = mat_from_static_euler(roll, pitch, yaw, is_radian).transpose();
     const matrix = UFRobotModel.BASE_STATIC_MATRIX_.clone();
-    matrix.multiply(UFRobotModel.TITL_ROTATION_MATRIX_).multiply(UFRobotModel.WORLD_OFFSET_MATRIX_);
+    matrix.multiply(UFRobotModel.TILT_ROTATION_MATRIX_).multiply(UFRobotModel.WORLD_OFFSET_MATRIX_);
     UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ = matrix;
   },
-  set_tilt_rotation(titl, rotation, is_radian) {
-    UFRobotModel.TITL_ROTATION_MATRIX_ = mat_from_rotation_euler(0, titl, rotation, is_radian);
+  set_tilt_rotation(tilt, rotation, is_radian) {
+    UFRobotModel.TILT_ROTATION_MATRIX_ = mat_from_rotation_euler(0, tilt, rotation, is_radian);
     const matrix = UFRobotModel.BASE_STATIC_MATRIX_.clone();
-    matrix.multiply(UFRobotModel.TITL_ROTATION_MATRIX_).multiply(UFRobotModel.WORLD_OFFSET_MATRIX_);
+    matrix.multiply(UFRobotModel.TILT_ROTATION_MATRIX_).multiply(UFRobotModel.WORLD_OFFSET_MATRIX_);
     UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ = matrix;
   },
   get_base_transform_controls_matrix() {
     if (UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ === null) {
       const matrix = UFRobotModel.BASE_STATIC_MATRIX_.clone();
-      matrix.multiply(UFRobotModel.TITL_ROTATION_MATRIX_).multiply(UFRobotModel.WORLD_OFFSET_MATRIX_);
+      matrix.multiply(UFRobotModel.TILT_ROTATION_MATRIX_).multiply(UFRobotModel.WORLD_OFFSET_MATRIX_);
       UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_ = matrix.clone();
     }
     return UFRobotModel.BASE_TRANSFORMCONTROLS_MATRIX_.clone();

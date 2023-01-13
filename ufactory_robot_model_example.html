@@ -11,12 +11,18 @@
       <button id="btn-xarm6-type8" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchModel(6, 8)">XARM6-TYPE8</button>
       <button id="btn-xarm6-type11" style="margin: 10px; background: #DDD; color: black; border-color: #DDD;" onclick="onSwitchModel(6, 11)">XARM6-TYPE11</button>
     </div>
-    <div style="text-align: center;">
+    <div style="text-align: center; margin-top: 10px;">
       <label id="label-no-end"><input name="EndEffector" type="radio" value="" checked="true" onclick="onSwitchEndEffector('')" />No End Effector</label> 
       <label id="lable-gripper"><input name="EndEffector" type="radio" value="gripper" onclick="onSwitchEndEffector('gripper')" />Gripper</label> 
       <label id="lable-vacuum-gripper"><input name="EndEffector" type="radio" value="vacuum-gripper" onclick="onSwitchEndEffector('vacuum-gripper')" />Vacuum Gripper</label> 
       <label id="lable-bio-gripper"><input name="EndEffector" type="radio" value="bio-gripper" onclick="onSwitchEndEffector('bio-gripper')" />BIO Gripper</label> 
       <label id="lable-robotiq-2F-85"><input name="EndEffector" type="radio" value="robotiq-2F-85" onclick="onSwitchEndEffector('robotiq-2F-85')" />Robotiq-2F-85</label>
+    </div>
+    <div style="text-align: center;display: block; margin-top: 10px;">
+      <label><span style="width: 200px; margin-right: 0px;">Tilt Angle: </span><input style="width: 500px;" type="range" min="0" max="180" value="0" step="1" onchange="setMountTilt(this.value)" /><span id="mount_tilt_val">0</span></label> 
+    </div>
+    <div style="text-align: center;display: block; margin-top: 10px;">
+      <label><span style="width: 200px; margin-right: 0px;">Rotate Angle: </span><input style="width: 500px;" type="range" min="-180" max="180" value="0" step="1" onchange="setMountRotation(this.value)" /><span id="mount_rot_val">0</span></label> 
     </div>
     <div id="model-wrapper">
       <div id="model-container"></div>
@@ -34,6 +40,10 @@
       const ROBOTS = [[5, 5], [6, 6], [7, 7], [6, 9], [6, 8], [6, 11]];
       UFRobotModel.IS_RAINBOW_COLOR = true;
       let curr_end_type = '';
+      let mount_tilt = 0;
+      let mount_rot = 0;
+      let world_offset = [0, 0, 0, 0, 0, 0];
+      let tcp_offset = [0, 0, 0, 0, 0, 0];
 
       function curRobotModel() {
         return UFRobotModel.getRobotModel(robot_axis, robot_type); 
@@ -41,6 +51,66 @@
 
       function RobotModelParams() {
         return curRobotModel().params;
+      }
+
+      function setModelMount() {
+        const position = [0, 6 / 180 * mount_tilt, 0];
+        if (mount_tilt <= 90) {
+          position[0] = 5 / 90 * mount_tilt;
+        }
+        else {
+          position[0] = 5 / 90 * (180 - mount_tilt);
+        }
+        position[0] += UFRobotModel.BASE_GROUP_POSITION[0];
+        position[1] += UFRobotModel.BASE_GROUP_POSITION[1];
+        position[2] += UFRobotModel.BASE_GROUP_POSITION[2];
+
+        curRobotModel().GROUPS[0].position.set(...position);
+
+        const matrix = mat_from_rotation_euler(0, 0, mount_tilt, false);
+        const matrix2 = mat_from_rotation_euler(0, mount_rot, 0, false);
+        matrix.multiply(matrix2);
+        curRobotModel().GROUPS[0].rotation.setFromRotationMatrix(matrix);
+        if (UFRobotModel.gridHelper) {
+          UFRobotModel.gridHelper.position.set(...position);
+          const rot = curRobotModel().GROUPS[0].rotation;
+          UFRobotModel.gridHelper.rotation.set(...[rot.x, rot.y, rot.z]);
+        }
+        UFRobotModel.set_tilt_rotation(mount_tilt, mount_rot, false);
+        if (UFRobotModel.baseTransformControls)
+          update_base_transform_controls();
+
+        if (UFRobotModel.controls) {
+          UFRobotModel.controls.minPolarAngle = UFRobotModel.DEFAULT_POLARANGLE;
+          UFRobotModel.controls.maxPolarAngle = UFRobotModel.DEFAULT_POLARANGLE;
+          UFRobotModel.controls.minAzimuthAngle = 0;
+          UFRobotModel.controls.maxAzimuthAngle = 0;
+          UFRobotModel.controls.update();
+          if (mount_tilt === 0 || mount_tilt === 180) {
+            // UFRobotModel.controls.minPolarAngle = 0;
+            // UFRobotModel.controls.maxPolarAngle = Math.PI;
+            UFRobotModel.controls.minAzimuthAngle = -Infinity;
+            UFRobotModel.controls.maxAzimuthAngle = Infinity;
+          }
+          else {
+            // UFRobotModel.controls.minPolarAngle = UFRobotModel.DEFAULT_POLARANGLE;
+            // UFRobotModel.controls.maxPolarAngle = UFRobotModel.DEFAULT_POLARANGLE;
+            UFRobotModel.controls.minAzimuthAngle = -Math.PI;
+            UFRobotModel.controls.maxAzimuthAngle = 0;
+          }
+        }
+      }
+
+      function setMountTilt(val) {
+        mount_tilt = Number(val);
+        document.getElementById('mount_tilt_val').innerHTML = mount_tilt;
+        setModelMount();
+      }
+
+      function setMountRotation(val) {
+        mount_rot = Number(val);
+        document.getElementById('mount_rot_val').innerHTML = mount_rot;
+        setModelMount();
       }
 
       function setStyle(axis, type) {
@@ -89,10 +159,47 @@
         switchModel(axis, type);
       }
 
+      function update_base_transform_controls() {
+        const matrix = UFRobotModel.get_base_transform_controls_matrix();
+        UFRobotModel.baseTransformControls.rotation.setFromRotationMatrix(matrix);
+        const point = new THREE.Vector3(-world_offset[0] * 0.01, -world_offset[1] * 0.01, -world_offset[2] * 0.01);
+        point.applyMatrix4(matrix);
+        UFRobotModel.baseTransformControls.attach(curRobotModel().GROUPS[0]);
+        UFRobotModel.baseTransformControls.position.add(point);
+      }
+
+      function update_tool_transform_controls() {
+        update_base_transform_controls();
+        const matrix = UFRobotModel.get_tool_transform_controls_matrix(rpy[0], rpy[1], rpy[2], false);
+        UFRobotModel.toolTransformControls.rotation.setFromRotationMatrix(matrix);
+        const point = new THREE.Vector3(tcp_offset[0] * 0.01, tcp_offset[1] * 0.01, tcp_offset[2] * 0.01);
+        point.applyMatrix4(matrix);
+        UFRobotModel.toolTransformControls.attach(curRobotModel().GROUPS[curRobotModel().AXIS].children[0]);
+        UFRobotModel.toolTransformControls.position.add(point);
+      }
+
       function onSwitchEndEffector(val) {
         if (val === curr_end_type) return;
         curr_end_type = val;
         UFRobotModel.addEndEffector(robot_axis, robot_type, curr_end_type);
+        const is_lite6 = robot_axis === 6 && robot_type === 9;
+        switch (curr_end_type) {
+          case '':
+            tcp_offset = is_lite6 ? [0, 0, 0, 0, 0, 0] : [0, 0, 0, 0, 0, 0];
+            break;
+          case 'gripper':
+            tcp_offset = is_lite6 ? [0.0, 0.0, 83.6, 0.0, 0.0, 0.0] : [0.0, 0.0, 172, 0.0, 0.0, 0.0];
+            break;
+          case 'vacuum-gripper':
+            tcp_offset = is_lite6 ? [0.0, 0.0, 61.1, 0.0, 0.0, 0.0] : [0.0, 0.0, 126, 0.0, 0.0, 0.0];
+            break;
+          case 'bio-gripper':
+            tcp_offset = is_lite6 ? [0, 0, 0, 0, 0, 0] : [159.5, 0.0, 59.5, 0.0, 0.0, 0.0];
+            break;
+          case 'robotiq-2F-85':
+            tcp_offset = is_lite6 ? [0, 0, 0, 0, 0, 0] : [0.0, 0.0, 174, 0.0, 0.0, 0.0];
+            break;
+        }
       }
 
       function switchModel(axis, type) {
@@ -108,6 +215,7 @@
               robot_axis = axis;
               robot_type = type;
               UFRobotModel.addEndEffector(robot_axis, robot_type, curr_end_type);
+              setModelMount();
             });
           }
         }
@@ -154,7 +262,7 @@
         UFRobotModel.baseTransformControls.scale.set(...UFRobotModel.BASE_TRANSFORMCONTROLS_SCALE);
         UFRobotModel.baseTransformControls.dispose();
         UFRobotModel.baseTransformControls.attach(curRobotModel().GROUPS[0]);
-        UFRobotModel.baseTransformControls.rotation.setFromRotationMatrix(UFRobotModel.get_base_transform_controls_matrix());
+        // UFRobotModel.baseTransformControls.rotation.setFromRotationMatrix(UFRobotModel.get_base_transform_controls_matrix());
       };
 
       function addToolTransformControls() {
@@ -163,14 +271,15 @@
         UFRobotModel.toolTransformControls.scale.set(...UFRobotModel.TOOL_TRANSFORMCONTROLS_SCALE);
         UFRobotModel.toolTransformControls.dispose();
         UFRobotModel.toolTransformControls.attach(curRobotModel().GROUPS[curRobotModel().GROUPS.length - 1].children[0]);
-        UFRobotModel.toolTransformControls.rotation.setFromRotationMatrix(UFRobotModel.get_tool_transform_controls_matrix(180, 0, 0, false));
+        // UFRobotModel.toolTransformControls.rotation.setFromRotationMatrix(UFRobotModel.get_tool_transform_controls_matrix(180, 0, 0, false));
       };
       
       function animate() {
         try {
           if (RobotModelParams().showToolTransformControls) {
-            UFRobotModel.toolTransformControls.attach(curRobotModel().GROUPS[curRobotModel().GROUPS.length - 1].children[0]);
-            UFRobotModel.toolTransformControls.rotation.setFromRotationMatrix(UFRobotModel.get_tool_transform_controls_matrix(rpy[0], rpy[1], rpy[2], false));
+            update_tool_transform_controls();
+            // UFRobotModel.toolTransformControls.attach(curRobotModel().GROUPS[curRobotModel().GROUPS.length - 1].children[0]);
+            // UFRobotModel.toolTransformControls.rotation.setFromRotationMatrix(UFRobotModel.get_tool_transform_controls_matrix(rpy[0], rpy[1], rpy[2], false));
           }
           // set joints to model
           curRobotModel().set(joints);
@@ -197,7 +306,7 @@
         addLights();
         addModels();
 
-        UFRobotModel.renderer = UFRobotModel.renderer || new THREE.WebGLRenderer( { antialias: true } );
+        UFRobotModel.renderer = UFRobotModel.renderer || new THREE.WebGLRenderer( { antialias: true, alpha: true } );
         UFRobotModel.renderer.setClearColor(0xffffff);
         UFRobotModel.controls = UFRobotModel.controls || new THREE.OrbitControls(UFRobotModel.camera, UFRobotModel.renderer.domElement);
 
@@ -226,6 +335,7 @@
         animate();
         onWindowResize();
         window.addEventListener('resize', onWindowResize, false); 
+        setModelMount();
       });
     </script>
   </body>
