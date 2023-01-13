@@ -30,19 +30,26 @@
 
 ### Example Display
 - #### xArm5 (Standard version)
-  ![xArm5](./docs/img/xarm5-type5.png)
+  ![xArm5](./docs/img/xarm5-type5_R0_T0.png)
+  ![xArm5](./docs/img/xarm5-type5_T90_R0.png)
+  ![xArm5](./docs/img/xarm5-type5_T0_R0_bio.png)
 
 - #### xArm6 (Standard version)
-  ![xArm6](./docs/img/xarm6-type6.png)
+  ![xArm6](./docs/img/xarm6-type6_R0_T0.png)
+  ![xArm6](./docs/img/xarm6-type6_T90_R180.png)
+  ![xArm6](./docs/img/xarm6-type6_T90_R0_robotiq.png)
 
 - #### xArm7 (Standard version)
-  ![xArm7](./docs/img/xarm7-type7.png)
+  ![xArm7](./docs/img/xarm7-type7_R0_T0.png)
+  ![xArm7](./docs/img/xarm7-type7_T180_R180_vacuum_gripper.png)
 
 - #### Lite6 (Standard version)
-  ![Lite6](./docs/img/xarm6-type9.png)
+  ![Lite6](./docs/img/xarm6-type9_R0_T0.png)
+  ![Lite6](./docs/img/xarm6-type9_T0_R0_gripper.png)
+  ![Lite6](./docs/img/xarm6-type9_T0_R0_vacuum_gripper.png)
 
 - #### xArm6-Type8 (Customized version)
-  ![xArm6-Type8](./docs/img/xarm6-type8.png)
+  ![xArm6-Type8](./docs/img/xarm6-type8_R0_T0.png)
 
 - #### xArm6-Type11 (Customized version)
-  ![xArm6-Type11](./docs/img/xarm6-type11.png)
+  ![xArm6-Type11](./docs/img/xarm6-type11_R0_T0.png)
